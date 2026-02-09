@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generation Link | Agence Design</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Manrope', sans-serif;
+        background-color: #050505;
+        color: #e5e5e5;
+        overflow-x: hidden;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        font-family: 'Space Grotesk', sans-serif;
+      }
+      .glass {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .glass-high {
+        background: rgba(20, 20, 20, 0.6);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .text-glow {
+        text-shadow: 0 0 20px rgba(34, 211, 238, 0.5);
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0a0a0a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #222;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #06b6d4;
+      }
+    </style>
+    <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.2.0",
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+    "framer-motion": "https://esm.sh/framer-motion@10.16.4",
+    "lucide-react": "https://esm.sh/lucide-react@0.292.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/"
+  }
+}
+</script>
+  <link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+      import React, { useState, useEffect, useRef } from 'react';
+      import { createRoot } from 'react-dom/client';
+      import { motion, AnimatePresence, useInView } from 'framer-motion';
+      import { 
+        Palette, BookOpen, Package, MapPin, Monitor, Share2, Megaphone, 
+        PenTool, Video, Lightbulb, Ruler, Menu, X, ArrowDown, ChevronRight, 
+        Mail, Phone, Linkedin, Instagram 
+      } from 'lucide-react';
+
+      // --- DATA ---
+      const servicesData = [
+        {
+          id: 'identite',
+          title: "Identité Visuelle",
+          icon: Palette,
+          description: "L'ADN de votre marque, sublimé et codifié.",
+          items: [
+            { title: "Logotypes", desc: "Création de logos vectoriels déclinables et intemporels." },
+            { title: "Charte graphique", desc: "Définition des règles (couleurs, typographies) pour une cohérence totale." },
+            { title: "Refonte (Rebranding)", desc: "Modernisation d'une identité existante sans perdre son héritage." },
+            { title: "Systèmes iconographiques", desc: "Set d'icônes sur mesure propre à votre écosystème." }
+          ]
+        },
+        {
+          id: 'edition',
+          title: "Édition",
+          icon: BookOpen,
+          description: "La mise en page au service de la lisibilité et de l'esthétique.",
+          items: [
+            { title: "Livres & Magazines", desc: "Gestion de grilles typographiques et hiérarchies complexes." },
+            { title: "Rapports annuels", desc: "Mise en valeur de données financières et textuelles denses." },
+            { title: "Catalogues produits", desc: "Organisation des références de manière lisible et structurée." },
+            { title: "Supports promotionnels", desc: "Brochures, dépliants et flyers impactants." },
+            { title: "Affiches", desc: "Création visuelle grand format pour événements." }
+          ]
+        },
+        {
+          id: 'packaging',
+          title: "Packaging",
+          icon: Package,
+          description: "Habiller vos produits pour séduire au premier regard.",
+          items: [
+            { title: "Packaging produit", desc: "Design de boîtes, étiquettes et contenants (avec tracés de découpe)." },
+            { title: "PLV 3D", desc: "Conception de présentoirs et totems publicitaires." },
+            { title: "Étiquetage industriel", desc: "Gestion de gros volumes pour génération d'étiquettes." }
+          ]
+        },
+        {
+          id: 'signaletique',
+          title: "Signalétique",
+          icon: MapPin,
+          description: "Guider et orienter dans l'espace physique.",
+          items: [
+            { title: "Orientation visuelle", desc: "Signalétique intérieure et extérieure pour bureaux et salons." }
+          ]
+        },
+        {
+          id: 'web',
+          title: "Web Design",
+          icon: Monitor,
+          description: "Des interfaces digitales intuitives et performantes.",
+          items: [
+            { title: "Webdesign (UI)", desc: "Maquettage d'interfaces vitrines ou e-commerce." },
+            { title: "Applications mobiles", desc: "Écrans adaptés aux usages tactiles (iOS/Android)." },
+            { title: "Newsletters", desc: "Visuels optimisés pour l'emailing et la lecture sur écran." },
+            { title: "Display Ads", desc: "Bannières variées pour Google Ads et réseaux sociaux." }
+          ]
+        },
+        {
+          id: 'social',
+          title: "Réseaux Sociaux",
+          icon: Share2,
+          description: "Engager votre communauté avec des visuels forts.",
+          items: [
+            { title: "Templates Social Media", desc: "Modèles réutilisables pour Instagram, LinkedIn..." },
+            { title: "Motion Social", desc: "Animations 2D courtes et percutantes pour le feed." }
+          ]
+        },
+        {
+          id: 'marketing',
+          title: "Marketing",
+          icon: Megaphone,
+          description: "Supports de vente et de présentation haut de gamme.",
+          items: [
+            { title: "Campagnes 360°", desc: "Déclinaison de concept sur supports physiques et digitaux." },
+            { title: "Présentations", desc: "Slides PowerPoint/Keynote haut de gamme pour pitchs." },
+            { title: "Datavisualisation", desc: "Transformation de données complexes en infographies ergonomiques." }
+          ]
+        },
+        {
+          id: 'illustration',
+          title: "Illustration",
+          icon: PenTool,
+          description: "L'art de raconter des histoires par l'image.",
+          items: [
+            { title: "Vectorielle & Artistique", desc: "Mascottes, décors, BD, ou créations assistées par IA." },
+            { title: "Lettering", desc: "Typographie sur mesure pour titres uniques." },
+            { title: "Storyboarding", desc: "Mise en images de scénarios avant production vidéo." }
+          ]
+        },
+        {
+          id: 'motion',
+          title: "Motion Design",
+          icon: Video,
+          description: "Donner vie au graphisme par le mouvement.",
+          items: [
+            { title: "Logo animé", desc: "Signature de mail et identité en mouvement." },
+            { title: "Vidéos explicatives", desc: "Pédagogie visuelle animée." },
+            { title: "Habillage TV", desc: "Titres, bandeaux et transitions broadcast." }
+          ]
+        },
+        {
+          id: 'conseil',
+          title: "Conseil & Technique",
+          icon: Lightbulb,
+          description: "Expertise stratégique pour votre communication.",
+          items: [
+            { title: "Audit de communication", desc: "Analyse de l'existant et préconisations stratégiques." }
+          ]
+        },
+        {
+          id: 'dessin',
+          title: "Dessin Technique",
+          icon: Ruler,
+          description: "Précision architecturale et industrielle.",
+          items: [
+            { title: "Plan 2D", desc: "Spécialité architecture et sécurité." },
+            { title: "Plan isométrique", desc: "Plans de masse et bâtiments industriels." },
+            { title: "Plan 3D", desc: "Plans complets de projets immobiliers." }
+          ]
+        }
+      ];
+
+      // --- COMPONENTS ---
+
+      // ServiceCard.tsx
+      const ServiceCard = ({ title, description, items, icon: Icon, index }) => {
+        const ref = useRef(null);
+        const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+        return (
+          <motion.div
+            ref={ref}
+            initial={{ opacity: 0, y: 40 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: index * 0.1 }}
+            className="group relative"
+          >
+            <div className="h-full glass p-8 rounded-2xl hover:bg-zinc-900/60 transition-colors duration-500 border border-zinc-800/50 hover:border-cyan-500/30 overflow-hidden">
+              {/* Decorative Glow */}
+              <div className="absolute -right-12 -top-12 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl group-hover:bg-cyan-500/20 transition-all duration-500" />
+              
+              <div className="relative z-10">
+                <div className="mb-6 p-3 bg-zinc-950 w-fit rounded-xl border border-zinc-800 group-hover:border-cyan-500/50 transition-colors">
+                  <Icon size={32} className="text-zinc-300 group-hover:text-cyan-400 transition-colors duration-300" />
+                </div>
+                
+                <h3 className="text-2xl font-bold text-white mb-2 font-['Space_Grotesk'] group-hover:text-cyan-400 transition-colors">{title}</h3>
+                <p className="text-zinc-400 mb-8 text-sm leading-relaxed">{description}</p>
+                
+                <div className="space-y-4">
+                  {items.map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-3 group/item">
+                      <ChevronRight size={16} className="text-cyan-600 mt-1 shrink-0 group-hover/item:text-cyan-400 transition-colors" />
+                      <div>
+                        <h4 className="text-zinc-200 text-sm font-semibold">{item.title}</h4>
+                        <p className="text-zinc-500 text-xs mt-0.5">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        );
+      };
+
+      // Navbar.tsx
+      const Navbar = () => {
+        const [isOpen, setIsOpen] = useState(false);
+        const [scrolled, setScrolled] = useState(false);
+
+        useEffect(() => {
+          const handleScroll = () => {
+            setScrolled(window.scrollY > 50);
+          };
+          window.addEventListener('scroll', handleScroll);
+          return () => window.removeEventListener('scroll', handleScroll);
+        }, []);
+
+        const navLinks = [
+          { name: 'Services', href: '#services' },
+          { name: 'Agence', href: '#agence' },
+          { name: 'Contact', href: '#contact' },
+        ];
+
+        return (
+          <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'glass-high py-3' : 'bg-transparent py-6'}`}>
+            <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+              <a href="#" className="relative z-50 group">
+                  <div className="bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg transition-transform hover:scale-105 duration-300">
+                      <img 
+                          src="https://i.imgur.com/vHqj2nL.png" 
+                          alt="Generation Link" 
+                          className="h-8 md:h-10 w-auto object-contain"
+                      />
+                  </div>
+              </a>
+
+              <div className="hidden md:flex items-center space-x-12">
+                {navLinks.map((link) => (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    className="text-sm font-medium uppercase tracking-widest text-zinc-400 hover:text-cyan-400 transition-colors duration-300 relative group"
+                  >
+                    {link.name}
+                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-cyan-400 transition-all duration-300 group-hover:w-full"></span>
+                  </a>
+                ))}
+                <a
+                  href="#contact"
+                  className="px-6 py-2 bg-cyan-500 text-black font-bold uppercase text-xs tracking-wider hover:bg-cyan-400 transition-colors rounded-full"
+                >
+                  Démarrer un projet
+                </a>
+              </div>
+
+              <button
+                className="md:hidden relative z-50 text-white"
+                onClick={() => setIsOpen(!isOpen)}
+              >
+                {isOpen ? <X size={28} /> : <Menu size={28} />}
+              </button>
+
+              <AnimatePresence>
+                {isOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, x: '100%' }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: '100%' }}
+                    transition={{ type: 'tween', duration: 0.4 }}
+                    className="fixed inset-0 bg-zinc-950/95 backdrop-blur-xl z-40 flex flex-col items-center justify-center space-y-8"
+                  >
+                    {navLinks.map((link) => (
+                      <a
+                        key={link.name}
+                        href={link.href}
+                        onClick={() => setIsOpen(false)}
+                        className="text-3xl font-light text-white hover:text-cyan-400 transition-colors"
+                      >
+                        {link.name}
+                      </a>
+                    ))}
+                    <a
+                       href="#contact"
+                       onClick={() => setIsOpen(false)}
+                       className="mt-8 px-8 py-3 bg-cyan-500 text-black font-bold text-lg rounded-full"
+                    >
+                      Démarrer un projet
+                    </a>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </nav>
+        );
+      };
+
+      // Hero.tsx
+      const Hero = () => {
+        return (
+          <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#050505]">
+            <div className="absolute inset-0 z-0">
+              <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-[120px] mix-blend-screen animate-pulse" style={{ animationDuration: '4s' }} />
+              <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[100px] mix-blend-screen" />
+              <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
+            </div>
+
+            <div className="relative z-10 max-w-7xl mx-auto px-6 text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="mb-6 inline-block"
+              >
+                <span className="px-4 py-2 rounded-full border border-zinc-800 bg-zinc-900/50 backdrop-blur-md text-cyan-400 text-xs font-bold tracking-[0.2em] uppercase">
+                  Agence Créative 2025
+                </span>
+              </motion.div>
+
+              <motion.h1
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1, delay: 0.2 }}
+                className="text-5xl md:text-7xl lg:text-9xl font-bold tracking-tight text-white mb-8 leading-tight font-['Space_Grotesk']"
+              >
+                LIEZ VOTRE <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-white to-purple-400">IMAGINATION</span> <br />
+                AVEC LA RÉALITÉ
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 0.6 }}
+                className="text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed"
+              >
+                Generation Link transforme vos idées abstraites en expériences tangibles. 
+                Une vision avant-gardiste du design graphique et digital.
+              </motion.p>
+
+              <motion.div
+                 initial={{ opacity: 0, y: 20 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 transition={{ duration: 0.8, delay: 1 }}
+                 className="mt-12 flex justify-center gap-6"
+              >
+                  <a href="#services" className="px-8 py-4 bg-white text-black font-bold text-sm tracking-widest uppercase hover:bg-cyan-400 transition-all duration-300 rounded-sm">
+                      Nos Expertises
+                  </a>
+                  <a href="#contact" className="px-8 py-4 border border-zinc-700 text-white font-bold text-sm tracking-widest uppercase hover:border-cyan-400 hover:text-cyan-400 transition-all duration-300 rounded-sm glass">
+                      Contact
+                  </a>
+              </motion.div>
+            </div>
+
+            <motion.div 
+              className="absolute bottom-10 left-1/2 -translate-x-1/2 text-zinc-600"
+              animate={{ y: [0, 10, 0] }}
+              transition={{ repeat: Infinity, duration: 2 }}
+            >
+              <ArrowDown size={24} />
+            </motion.div>
+          </section>
+        );
+      };
+
+      // Footer.tsx
+      const Footer = () => {
+        return (
+          <footer id="contact" className="relative bg-[#020202] border-t border-zinc-900 pt-20 pb-10">
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-20">
+                
+                <div>
+                  <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 font-['Space_Grotesk']">
+                    Prêt à <span className="text-cyan-400">lier</span> votre projet ?
+                  </h2>
+                  <p className="text-zinc-400 mb-10 text-lg">
+                    Discutons de vos ambitions. Notre équipe est prête à transformer votre vision en réalité visuelle percutante.
+                  </p>
+                  
+                  <div className="space-y-6">
+                    <a href="mailto:hello@generationlink.com" className="flex items-center gap-4 text-zinc-300 hover:text-white transition-colors group">
+                      <div className="p-3 glass rounded-full group-hover:border-cyan-500/50">
+                        <Mail size={20} className="text-cyan-400" />
+                      </div>
+                      <span className="text-lg">hello@generationlink.com</span>
+                    </a>
+                    <div className="flex items-center gap-4 text-zinc-300">
+                      <div className="p-3 glass rounded-full">
+                        <Phone size={20} className="text-cyan-400" />
+                      </div>
+                      <span className="text-lg">+33 1 23 45 67 89</span>
+                    </div>
+                    <div className="flex items-center gap-4 text-zinc-300">
+                      <div className="p-3 glass rounded-full">
+                        <MapPin size={20} className="text-cyan-400" />
+                      </div>
+                      <span className="text-lg">Paris, France</span>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 mt-10">
+                    <a href="#" className="p-3 glass rounded-lg hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white">
+                      <Linkedin size={24} />
+                    </a>
+                    <a href="#" className="p-3 glass rounded-lg hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white">
+                      <Instagram size={24} />
+                    </a>
+                  </div>
+                </div>
+
+                <div className="bg-zinc-900/30 border border-zinc-800 p-8 rounded-2xl backdrop-blur-sm">
+                  <form className="space-y-6">
+                    <div className="grid grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wider text-zinc-500">Nom</label>
+                        <input type="text" className="w-full bg-black/50 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-cyan-500 transition-colors" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-wider text-zinc-500">Prénom</label>
+                        <input type="text" className="w-full bg-black/50 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-cyan-500 transition-colors" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase tracking-wider text-zinc-500">Email</label>
+                      <input type="email" className="w-full bg-black/50 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-cyan-500 transition-colors" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase tracking-wider text-zinc-500">Message</label>
+                      <textarea rows={4} className="w-full bg-black/50 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-cyan-500 transition-colors"></textarea>
+                    </div>
+                    <button className="w-full py-4 bg-cyan-500 hover:bg-cyan-400 text-black font-bold uppercase tracking-widest rounded-lg transition-colors">
+                      Envoyer
+                    </button>
+                  </form>
+                </div>
+
+              </div>
+
+              <div className="border-t border-zinc-900 pt-8 flex flex-col md:flex-row justify-between items-center text-zinc-600 text-sm">
+                  <div className="mb-4 md:mb-0 bg-white/10 px-2 py-1 rounded inline-block">
+                       <img src="https://i.imgur.com/vHqj2nL.png" alt="Logo footer" className="h-4 opacity-70" />
+                  </div>
+                  <p>&copy; {new Date().getFullYear()} Generation Link. Tous droits réservés.</p>
+              </div>
+            </div>
+          </footer>
+        );
+      };
+
+      // App.tsx
+      const App = () => {
+        return (
+          <div className="bg-[#050505] min-h-screen text-white selection:bg-cyan-500 selection:text-black">
+            <Navbar />
+            
+            <main>
+              <Hero />
+              
+              <section id="services" className="py-32 relative">
+                  <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 pointer-events-none"></div>
+
+                  <div className="max-w-7xl mx-auto px-6 relative z-10">
+                      <div className="mb-20">
+                          <motion.h2 
+                              initial={{ opacity: 0, x: -50 }}
+                              whileInView={{ opacity: 1, x: 0 }}
+                              viewport={{ once: true }}
+                              transition={{ duration: 0.8 }}
+                              className="text-4xl md:text-6xl font-bold mb-6 font-['Space_Grotesk']"
+                          >
+                              NOS DOMAINES <br/>
+                              <span className="text-zinc-600">D'EXPERTISE</span>
+                          </motion.h2>
+                          <motion.div 
+                              initial={{ width: 0 }}
+                              whileInView={{ width: 100 }}
+                              viewport={{ once: true }}
+                              className="h-1 bg-cyan-500"
+                          />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {servicesData.map((service, index) => (
+                              <ServiceCard 
+                                  key={service.id}
+                                  index={index}
+                                  title={service.title}
+                                  description={service.description}
+                                  items={service.items}
+                                  icon={service.icon}
+                              />
+                          ))}
+                      </div>
+                  </div>
+              </section>
+
+              <section id="agence" className="py-24 bg-zinc-900/20 border-y border-zinc-900 relative overflow-hidden">
+                   <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-cyan-900/10 to-transparent pointer-events-none" />
+                   <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+                      <div>
+                           <h2 className="text-3xl md:text-5xl font-bold mb-8 font-['Space_Grotesk'] leading-tight">
+                              Une vision <span className="text-cyan-400">avant-gardiste</span> du design.
+                           </h2>
+                           <p className="text-zinc-400 text-lg leading-relaxed mb-6">
+                              Chez Generation Link, nous ne suivons pas seulement les tendances, nous les anticipons. 
+                              Notre approche fusionne créativité artistique et rigueur technique pour offrir des solutions 
+                              qui marquent les esprits et durent dans le temps.
+                           </p>
+                           <ul className="space-y-4">
+                              <li className="flex items-center text-zinc-300">
+                                  <span className="w-2 h-2 bg-cyan-400 rounded-full mr-4"></span>
+                                  Designs pilotés par la donnée et l'émotion
+                              </li>
+                               <li className="flex items-center text-zinc-300">
+                                  <span className="w-2 h-2 bg-cyan-400 rounded-full mr-4"></span>
+                                  Technologies créatives de pointe (IA, 3D)
+                              </li>
+                               <li className="flex items-center text-zinc-300">
+                                  <span className="w-2 h-2 bg-cyan-400 rounded-full mr-4"></span>
+                                  Accompagnement 360° sur tous supports
+                              </li>
+                           </ul>
+                      </div>
+                      <div className="relative">
+                          <div className="aspect-square rounded-2xl overflow-hidden glass relative group">
+                              <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/20 to-purple-500/20 mix-blend-overlay z-10"></div>
+                              <img 
+                                  src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=1000" 
+                                  alt="Agency Studio" 
+                                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-110"
+                              />
+                              <div className="absolute bottom-0 left-0 p-8 z-20">
+                                   <div className="text-6xl font-bold text-white mb-2">10+</div>
+                                   <div className="text-sm uppercase tracking-widest text-zinc-300">Années d'expérience</div>
+                              </div>
+                          </div>
+                      </div>
+                   </div>
+              </section>
+
+            </main>
+
+            <Footer />
+          </div>
+        );
+      };
+
+      // --- MOUNT ---
+      const rootElement = document.getElementById('root');
+      if (rootElement) {
+        const root = createRoot(rootElement);
+        root.render(
+          <React.StrictMode>
+            <App />
+          </React.StrictMode>
+        );
+      }
+    </script>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
